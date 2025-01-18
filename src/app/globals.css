@@ -2,20 +2,194 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+body {
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.75rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 210 20% 10%;
+    --foreground: 210 15% 98%;
+    --card: 210 20% 12%;
+    --card-foreground: 210 15% 98%;
+    --popover: 210 20% 12%;
+    --popover-foreground: 210 15% 98%;
+    --primary: 200 20% 55%;
+    --primary-foreground: 200 20% 10%;
+    --secondary: 180 10% 35%;
+    --secondary-foreground: 180 10% 98%;
+    --muted: 210 20% 20%;
+    --muted-foreground: 210 15% 70%;
+    --accent: 240 15% 65%;
+    --accent-foreground: 240 15% 10%;
+    --destructive: 0 60% 40%;
+    --destructive-foreground: 0 60% 98%;
+    --border: 210 20% 25%;
+    --input: 210 20% 25%;
+    --ring: 200 20% 55%;
+    --chart-1: 200 20% 55%;
+    --chart-2: 180 10% 35%;
+    --chart-3: 240 15% 65%;
+    --chart-4: 160 20% 60%;
+    --chart-5: 30 15% 50%;
+    --sidebar-background: 210 20% 12%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 200 20% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 20% 20%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 200 20% 55%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+.markdown-content {
+  color: var(--card-foreground);
+  @apply text-base;
+}
+.markdown-content > * {
+  margin-bottom: 0.5rem;
+}
+.markdown-content > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Titres */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  @apply text-2xl font-semibold;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content h1 {
+  @apply text-2xl;
+}
+.markdown-content h2 {
+  @apply text-xl;
+}
+.markdown-content h3 {
+  @apply text-xl;
+}
+.markdown-content h4 {
+  @apply text-base;
+}
+
+/* Paragraphes */
+.markdown-content p {
+  margin-bottom: 0.5rem;
+}
+
+/* Listes */
+.markdown-content ul,
+.markdown-content ol {
+  margin-bottom: 0.5rem;
+  padding-left: 1rem;
+}
+.markdown-content ul {
+  list-style: disc;
+}
+.markdown-content ol {
+  list-style: decimal;
+}
+.markdown-content ol li::marker {
+  @apply font-semibold text-lg;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5rem;
+}
+
+/* Code inline */
+
+.markdown-content pre code {
+  @apply text-sm;
+}
+
+/* Citations */
+.markdown-content blockquote {
+  border-left: 4px solid rgb(209, 213, 219);
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  color: rgb(55, 65, 81);
+}
+
+/* Liens */
+.markdown-content a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+
+.markdown-content a:hover {
+  text-decoration: none;
+}
+
+/* Tables */
+.markdown-content table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+.markdown-content th,
+.markdown-content td {
+  padding: 0.5rem;
+  border: 1px solid rgb(209, 213, 219);
+}
+
+.markdown-content th {
+  background-color: rgb(243, 244, 246);
+  font-weight: 600;
+}
+
+/* Séparateurs horizontaux */
+.markdown-content hr {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid rgb(209, 213, 219);
 }
