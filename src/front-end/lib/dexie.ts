@@ -3,7 +3,7 @@ import Dexie, { Table } from 'dexie';
 import { ClientMessage } from '~/front-end/types/chat';
 
 class Db extends Dexie {
-  chats!: Table<Chat>;
+  chats!: Table<Omit<Chat, 'userId'>>;
   messages!: Table<
     ClientMessage
   >;

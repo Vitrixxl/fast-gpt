@@ -10,6 +10,8 @@ import { Toaster } from '~/components/ui/toaster';
 import { DeleteChatDialog } from '~/components/delete-chat-dialog';
 import { RenameChatDialog } from '~/components/rename-chat-dialog';
 import { Outlet } from 'react-router';
+import { ChatForm } from '~/components/chat-form';
+import { SwitchTheme } from '~/components/switch-theme';
 
 export default function AppLayout() {
   const { data } = useSession();
@@ -31,6 +33,7 @@ export default function AppLayout() {
         <div className='flex h-dvh w-full flex-col overflow-hidden'>
           <header className='sticky top-0 z-10 -mb-8 flex h-14 items-center gap-3  pr-2 px-2 justify-between bg-gradient-to-b from-background/50 via-background to-transparent'>
             <SidebarTrigger />
+            <SwitchTheme />
           </header>
           {/* Main container */}
 

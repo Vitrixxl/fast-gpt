@@ -1,5 +1,8 @@
 'use client';
-import { userMessageWithContentAtom } from '~/front-end/atoms/chat';
+import {
+  assistantMessageWithContentAtom,
+  userMessageWithContentAtom,
+} from '~/front-end/atoms/chat';
 import { forceScrollAtom, isAtBottomAtom } from '~/front-end/atoms/scroll';
 import { cn } from '~/lib/utils';
 import { useAtom, useAtomValue } from 'jotai';
@@ -17,7 +20,7 @@ export const AutoScrollContainer: React.FC<AutoScrollContainerProps> = ({
 }) => {
   const ref = React.useRef<HTMLDivElement | null>(null);
   const [isAtBottom, setIsAtBottom] = useAtom(isAtBottomAtom);
-  const messages = useAtomValue(userMessageWithContentAtom);
+  const messages = useAtomValue(assistantMessageWithContentAtom);
   const [forceScroll, setForceScroll] = useAtom(forceScrollAtom);
 
   const scrollDown = (container: HTMLDivElement) => {

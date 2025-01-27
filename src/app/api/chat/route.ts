@@ -11,11 +11,13 @@ export async function POST(request: Request) {
     const requestId = uuid();
     const responseId = uuid();
     const body = await request.json();
+    console.log(body);
+    console.log(typeof body);
     const { error, data } = ChatRequestSchema.safeParse(body);
 
     if (error || !data) {
       return NextResponse.json(
-        { error: 'Invalid body' },
+        { error: 'Invalid body', ...error },
         { status: 400 },
       );
     }
@@ -35,10 +37,12 @@ export async function POST(request: Request) {
      */
     let responseBuffer = '';
 
+    const sessionPromise = auth();
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          controller.enqueue(`START:${requestId}|${responseId}`);
+          controller.enqueue(`START:${requestId}|${responseId}|`);
+
           const completion = getCompletion(model, messages);
 
           let titlePromise;
@@ -61,29 +65,45 @@ export async function POST(request: Request) {
             controller.enqueue(`TITLE:${title}`);
           }
 
-          await db.message.createMany({
-            data: [
-              //request message
-              {
-                id: requestId,
-                content: messages[messages.length - 1]?.content || '',
-                chatId,
-                sender: 'user',
-                createdAt: requestTimestamp,
+          const session = await sessionPromise;
+          if (!session) controller.close();
+          else {
+            const exist = await db.chat.count({
+              where: {
+                id: chatId,
               },
-              //response message
-              {
-                id: responseId,
-                content: responseBuffer,
-                chatId,
-                sender: 'assistant',
-                ai: model.startsWith('gpt') ? 'GPT' : 'CLAUDE',
-                createdAt: new Date(),
-              },
-            ],
-          });
-
-          controller.close();
+            });
+            if (exist == 0) {
+              await db.chat.create({
+                data: {
+                  id: chatId,
+                  title: title || 'New chat',
+                  userId: session.user.id,
+                },
+              });
+            }
+            await db.message.createMany({
+              data: [
+                //request message
+                {
+                  id: requestId,
+                  content: messages[messages.length - 1]?.content || '',
+                  chatId,
+                  sender: 'user',
+                  createdAt: requestTimestamp,
+                },
+                //response message
+                {
+                  id: responseId,
+                  content: responseBuffer,
+                  chatId,
+                  sender: 'assistant',
+                  ai: model.startsWith('gpt') ? 'GPT' : 'CLAUDE',
+                  createdAt: new Date(),
+                },
+              ],
+            });
+          }
         } catch (error) {
           if (error instanceof Error) {
             controller.enqueue(encoder.encode(`ERROR:${error.message}`));

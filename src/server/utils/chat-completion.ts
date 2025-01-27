@@ -49,7 +49,7 @@ export async function getTitle(prompt: string) {
     messages: [{
       role: 'system',
       content:
-        "Your role extract the main idea and a title that sum up the message. The title shouldn't be longer that really few words and always in the same language than the user. You'll response simply by the title nothing else, I don't want you to answere with \"\" at all just the title,",
+        "Your role extract the main idea and a title that sum up the message. The title shouldn't be longer that really few words and DESCRIBE what the user want. The title must always in the same language than the user, in case of doubt admit that the language is english. You'll response simply by the title nothing else, I don't want you to answere with \"\" at all just the title,",
     }, { role: 'user', content: prompt }],
   });
   if (!completion || !completion.choices[0]) return;

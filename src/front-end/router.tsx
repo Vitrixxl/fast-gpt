@@ -1,8 +1,11 @@
 import { MessageContainer } from '~/components/message-container';
-import { currentChatAtom } from '~/front-end/atoms/chat';
+import { currentChatAtom, isNewChatAtom } from '~/front-end/atoms/chat';
 import AppLayout from '~/front-end/layouts/app-layout';
 import { getDefaultStore } from 'jotai';
-import { createBrowserRouter, RouterProvider } from 'react-router';
+import { createBrowserRouter, redirect, RouterProvider } from 'react-router';
+import { Welcome } from '~/components/welcome';
+import { dxdb } from '~/front-end/lib/dexie';
+import { setChatMessages } from '~/front-end/features/chat/utils';
 
 const store = getDefaultStore();
 // Définissez votre router avec createBrowserRouter
@@ -17,14 +20,24 @@ const router = createBrowserRouter([
           return true;
         }),
         path: '/chat',
+        element: <Welcome />,
       },
       {
         path: '/chat/:id',
-        loader: (({ params: { id } }) => {
-          if (!id) return false;
+        loader: (async ({ params: { id } }) => {
+          if (!id) return;
           store.set(currentChatAtom, id);
-          return true;
+          const exist = await dxdb.chats.where('id').equals(id).count();
+          if (exist == 0) {
+            return redirect('/chat');
+          }
+          if (store.get(isNewChatAtom)) {
+            store.set(isNewChatAtom, false);
+            return;
+          }
+          setChatMessages(id);
         }),
+
         element: <MessageContainer />,
       },
     ],

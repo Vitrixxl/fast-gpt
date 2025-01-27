@@ -3,20 +3,17 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
 import { deleteChatAtom } from '~/front-end/atoms/dialog';
-import { dxdb } from '~/front-end/lib/dexie';
 import { useAtom } from 'jotai';
+import { useDeleteChat } from '~/front-end/features/chat/mutations/useDeleteChat';
 
 export const DeleteChatDialog = () => {
   const [deleteChatState, setDeleteChatState] = useAtom(deleteChatAtom);
-  const handleConfirm = async () => {
-    await dxdb.chats.delete(deleteChatState.id);
-    await dxdb.messages.where('chatId').equals(deleteChatState.id).delete();
-    setDeleteChatState({ open: false, id: '' });
-  };
+  const deleteChat = useDeleteChat();
   return (
     <Dialog
       onOpenChange={(open) =>
@@ -32,12 +29,23 @@ export const DeleteChatDialog = () => {
             All the data in this chat will be destroyed forever
           </DialogDescription>
         </DialogHeader>
-        <div className='flex gap-2'>
-          <Button variant={'secondary'}>Cancel</Button>
-          <Button variant={'destructive'} autoFocus onMouseDown={handleConfirm}>
-            Confirm
-          </Button>
-        </div>
+        <DialogFooter>
+          <div className='flex gap-2'>
+            <Button
+              variant={'secondary'}
+              onClick={() => setDeleteChatState({ open: false, id: '' })}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={'destructive'}
+              autoFocus
+              onMouseDown={deleteChat}
+            >
+              Confirm
+            </Button>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

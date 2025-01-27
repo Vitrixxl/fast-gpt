@@ -6,35 +6,32 @@ import {
   SidebarMenu,
   SidebarMenuButton,
 } from '~/components/ui/sidebar';
-import { sessionAtom } from '~/front-end/atoms/session.atoms';
-import { useAtom } from 'jotai';
+import { sessionAtom } from '~/front-end/atoms/session';
+import { useAtomValue } from 'jotai';
 import { Button } from '~/components/ui/button';
 import { LucidePlus } from 'lucide-react';
-import { useNavigate } from 'react-router';
-import { createChat } from '~/front-end/api/chat.api';
 import { dxdb } from '~/front-end/lib/dexie';
+import { useCreateChat } from '~/front-end/features/chat/mutations/useCreateChat';
 
 export const NavFooter = () => {
-  const [user] = useAtom(sessionAtom);
-  const navigate = useNavigate();
-  const addChat = async () => {
-    const id = await createChat();
-    if (id) navigate(`/chat/${id}`);
-  };
+  const user = useAtomValue(sessionAtom);
+  const name = user?.name;
+
+  const createChat = useCreateChat();
   return (
     <SidebarFooter>
       <SidebarMenu>
         <SidebarMenuButton
-          className='hover:bg-primary/90 active:bg-primary/90 selection:w-10'
+          className='hover:bg-primary/90 active:bg-primary/90 selection:w-10 !text-primary-foreground'
           asChild
           tooltip={'New chat'}
         >
           <Button
             className='group-data-[collapsible=icon]:gap-0 transition-[gap] duration-300'
-            onMouseDown={addChat}
+            onMouseDown={createChat}
           >
             <LucidePlus />
-            <p className='transition-all duration-500 overflow-hidden group-data-[collabsible=icon]:w-0'>
+            <p className='transition-[width] duration-500 overflow-hidden group-data-[collabsible=icon]:w-0'>
               New chat
             </p>
           </Button>
@@ -53,15 +50,16 @@ export const NavFooter = () => {
               }}
               tooltip={'Account'}
             >
-              <Avatar className='rounded-lg size-8'>
+              <Avatar className='rounded-lg size-8 border-border border'>
                 <AvatarImage
                   src={user.image as string}
                   alt='Vitrice'
                 />
                 <AvatarFallback className='rounded-lg'>
-                  {user.name &&
-                    user.name.split(' ')[0][0].toUpperCase() +
-                      user.name.split(' ')[1][0].toUpperCase()}
+                  {name && (
+                    name.split(' ')[0]?.[0]?.toUpperCase() +
+                    (name.split(' ')[1]?.[0]?.toUpperCase() || '')
+                  )}
                 </AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>

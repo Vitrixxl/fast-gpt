@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { ClaudeLogo } from '~/components/icons';
 import { GPTLogo } from '~/components/icons';
-import { AssistantMessage } from '~/front-end/types/chat';
+import { AssistantMessageType } from '~/front-end/types/chat';
 
 import { userMessageWithContentAtom } from '~/front-end/atoms/chat';
 import { useAtomValue } from 'jotai';
@@ -42,40 +42,32 @@ export const UserMessage = React.memo((
 });
 
 UserMessage.displayName = 'UserMessage';
-const MemoizedLogo = React.memo(
-  ({ ai }: { ai: 'gpt' | string }) => (
-    <div className='size-8 shrink-0 flex items-center justify-center'>
-      {ai == 'gpt'
-        ? <GPTLogo className='!size-6 ' />
-        : <ClaudeLogo className='!size-6 ' />}
-    </div>
-  ),
-  (prev, next) => {
-    if (prev.ai != next.ai) return true;
-    return false;
-  },
+const MemoizedLogo = ({ ai }: { ai: 'gpt' | string }) => (
+  <div className='size-8 shrink-0 flex items-center justify-center '>
+    {ai.startsWith('gpt')
+      ? <GPTLogo className='!size-6 ' />
+      : <ClaudeLogo className='!size-6 ' />}
+  </div>
 );
 
-MemoizedLogo.displayName = 'AIMessageLogo';
 export const AssistantMessage = React.memo((
-  { ai, error, id }: Omit<AssistantMessage, 'content'>,
+  { ai, error, id }: Omit<AssistantMessageType, 'content' | 'role'>,
 ) => {
   const Content = () => {
     if (error) {
       return <span className='mt-1  text-destructive'>Error: {error}</span>;
     }
     return (
-      <div className='min-w-0 pt-1'>
+      <div className='min-w-0 mt-0.5'>
         <MarkdownRenderer
           id={id}
-          role='assistant'
         />
       </div>
     );
   };
   return (
     <article
-      className={`relative flex gap-2 bg-card rounded-xl border border-border py-2 pr-6 w-fit max-w-full pl-2 group pt-1`}
+      className={`relative flex gap-2 bg-card rounded-xl border border-border py-2 pr-6 w-fit max-w-full pl-2 group`}
       data-message-id={id}
     >
       <MemoizedLogo ai={ai} />

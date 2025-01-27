@@ -34,7 +34,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 First of all what i need to do 
 
-- [ ] Copy every component
+- [x] Copy every component
 - [ ] Finish every end point
 - [ ] Add a limite rate for free request with account and ip
 - [ ] Add a payement process with stripe

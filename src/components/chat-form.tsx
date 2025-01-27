@@ -4,38 +4,17 @@ import { Button } from '~/components/ui/button';
 import { isImportantKey } from '~/lib/keyboard-utils';
 import { LucideArrowUp, LucidePaperclip } from 'lucide-react';
 import React from 'react';
-import { useNavigate, useParams } from 'react-router';
 import { AISelect } from '~/components/ai-selector';
-// import { createChat, sendMessage } from '~/front-end/api/chat.api';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { renameChatAtom } from '~/front-end/atoms/dialog';
-import { currentChatAtom, isNewChatAtom } from '~/front-end/atoms/chat';
-import { submitChatForm } from '~/front-end/features/chat/api';
+import { useSendMessage } from '~/front-end/features/chat/mutations/useSendMessage';
+import { setPriority } from 'os';
 
 export const ChatForm = () => {
-  const params = useParams();
   const [prompt, setPrompt] = React.useState('');
-  const currentChat = useAtomValue(currentChatAtom);
-  const setIsNewChat = useSetAtom(isNewChatAtom);
   const isRenameChatOpen = useAtomValue(renameChatAtom);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
-  const navigate = useNavigate();
-
-  async function handleSubmit() {
-    let chatId = currentChat;
-    if (!chatId) {
-      const newId = '';
-      if (!chatId) return;
-
-      setIsNewChat(true);
-      navigate(`chat/${chatId}`);
-      chatId = newId;
-    }
-
-    setPrompt('');
-    submitChatForm(chatId, prompt);
-    // sendMessage(id, inputValue);
-  }
+  const sendMessage = useSendMessage();
 
   const handleGlobalKeyDown = (e: KeyboardEvent) => {
     if (
@@ -52,7 +31,8 @@ export const ChatForm = () => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key == 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      return handleSubmit();
+      setPrompt('');
+      return sendMessage(prompt);
     }
   };
 
@@ -79,12 +59,10 @@ export const ChatForm = () => {
       <div className='flex justify-between items-center w-full'>
         <AISelect />
         <div className='flex gap-2 w-fit'>
-          <Button variant={'ghost'} size='icon' onClick={handleSubmit}>
-            <LucidePaperclip />
-          </Button>
+          <FileButton></FileButton>
           <Button
             size='icon'
-            onClick={handleSubmit}
+            onMouseDown={() => sendMessage(prompt)}
             disabled={prompt == ''}
           >
             <LucideArrowUp />
@@ -92,5 +70,16 @@ export const ChatForm = () => {
         </div>
       </div>
     </div>
+  );
+};
+const FileButton = (props: React.HTMLAttributes<HTMLButtonElement>) => {
+  return (
+    <Button
+      variant={'ghost'}
+      size='icon'
+      {...props}
+    >
+      <LucidePaperclip />
+    </Button>
   );
 };

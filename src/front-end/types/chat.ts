@@ -1,13 +1,13 @@
 import { models } from '~/lib/ai-models';
 
-export type UserMessage = {
+export type UserMessageType = {
   id: string;
   chatId: string;
   content: string;
   role: 'user';
   createdAt: Date;
 };
-export type AssistantMessage = {
+export type AssistantMessageType = {
   id: string;
   chatId: string;
   content: string;
@@ -18,4 +18,4 @@ export type AssistantMessage = {
   createdAt: Date;
 };
 
-export type ClientMessage = UserMessage | AssistantMessage;
+export type ClientMessage = UserMessageType | AssistantMessageType;

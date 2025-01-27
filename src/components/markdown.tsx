@@ -3,15 +3,11 @@ import highlight from 'highlight.js';
 
 import { marked } from 'marked';
 import ReactMarkDown from 'react-markdown';
-import { useAtom, useAtomValue } from 'jotai';
-import {
-  aiMessageWithContentAtom,
-  messagesContentTemp,
-  userMessageWithContentAtom,
-} from '~/front-end/atoms/chat';
+import { useAtomValue } from 'jotai';
+import { assistantMessageWithContentAtom } from '~/front-end/atoms/chat';
 import { useToast } from '~/hooks/use-toast';
-import { LucideCheck } from 'lucide-react';
-import { ScrollArea, ScrollBar } from '~/components/ui/scroll-area';
+import { LucideCheck, LucideCopy } from 'lucide-react';
+import { parseMarkdown } from '~/lib/utils';
 
 export const MemoizedMarkdownBlock = React.memo(
   (props: { content: string }) => {
@@ -58,20 +54,16 @@ const Line = React.memo(
 );
 
 const OptimizedCodeBlock = React.memo((
-  { id, messageId, role }: {
-    id: number;
+  { content, lang, messageId, id }: {
+    content: string;
+    lang: string;
     messageId: string;
-    role: 'user' | 'assistant';
+    id: string;
   },
 ) => {
   const { toast } = useToast();
-  const messagesContent = useAtomValue(aiMessageWithContentAtom);
 
-  const currentContent = messagesContent.find((m) => m.id == messageId)
-    ?.parsedContent[id];
-  if (!currentContent || currentContent.type != 'code') return;
-
-  const lines = currentContent.raw.split('\n').slice(1);
+  const lines = content.split('\n').slice(1);
   const escapedLines = lines.slice(0, lines.length - 1);
 
   const copy = () => {
@@ -90,52 +82,62 @@ const OptimizedCodeBlock = React.memo((
   return (
     <div className='border-border border rounded-lg overflow-hidden min-w-0 max-w-full mt-4 '>
       <div className='bg-card border-b border-border flex justify-between items-center py-2 px-4'>
-        <span className='text-sm text-gray-200 font-medium'>
-          {currentContent.lang || 'text'}
+        <span className='text-sm  font-medium'>
+          {lang || 'text'}
         </span>
         <button
           className='text-sm text-primary hover:text-primary/80'
           onClick={copy}
         >
-          Copy
+          <LucideCopy className='size-4' />
         </button>
       </div>
       <div className='overflow-x-auto w-full bg-accent'>
-        <ScrollArea>
-          <pre className='whitespace-pre-wrap p-2 text-sm bg-accent px-4 min-w-full w-max'>
+        {/* <ScrollArea> */}
+        <pre className='whitespace-pre-wrap p-2 text-sm bg-accent px-4 min-w-full w-max'>
       <code className='w-max'>
       {escapedLines.map((m, id) => (
         <Line
           content={m}
-          lang={currentContent.lang || 'text'}
+          lang={lang || 'text'}
           key={`${messageId}-${id}`}
         />
       ))}
       </code>
-          </pre>
-          <ScrollBar orientation='horizontal' />
-        </ScrollArea>
+        </pre>
+        {/*   <ScrollBar orientation='horizontal' /> */}
+        {/* </ScrollArea> */}
       </div>
     </div>
   );
 });
 
 export const MarkdownRenderer = React.memo(
-  ({ id, role }: { id: string; role: 'user' | 'assistant' }) => {
+  ({ id }: { id: string }) => {
     const messagesWithContent = useAtomValue(
-      aiMessageWithContentAtom,
+      assistantMessageWithContentAtom,
     );
-    const content = messagesWithContent.find((m) => m.id == id)?.parsedContent;
+    const content = messagesWithContent.find((m) => m.id == id)?.content;
     if (!content) return;
 
-    if (content.length == 0) {
+    const parsedContent = parseMarkdown(content);
+
+    if (parsedContent.length == 0) {
       return <div className='bg-foreground size-4 rounded-full -mr-2 mt-1' />;
     }
 
     return (
-      content.map((m, i) =>
+      parsedContent.map((m, i) =>
         m.type == 'code'
-          ? <OptimizedCodeBlock messageId={id} id={i} key={i} role={role} />
+          ? (
+            <OptimizedCodeBlock
+              content={m.raw}
+              messageId={id}
+              id={id}
+              lang={m.lang}
+              key={`${id}-${i}`}
+            />
+          )
           : (
             <MemoizedMarkdownBlock
               key={i}
