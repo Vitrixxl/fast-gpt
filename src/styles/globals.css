@@ -1,6 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+body * ::selection {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -27,8 +36,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
-  ;
+    --radius: 0.75rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -36,42 +44,45 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+    --card: 24 9.8% 10%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
+    --muted: 0 0% 15%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
+    --accent: 12 6.5% 15.1%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 85.7% 97.3%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
-  ;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --ring: 346.8 77.2% 49.8%;
+    --chart-1: 200 20% 55%;
+    --chart-2: 180 10% 35%;
+    --chart-3: 240 15% 65%;
+    --chart-4: 160 20% 60%;
+    --chart-5: 30 15% 50%;
+    --sidebar-background: 24 9.8% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 346.8 77.2% 49.8;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent: 12 6.5% 15.1%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 200 20% 55%;
+  }
 }
+
 @layer base {
   * {
     @apply border-border;
@@ -79,4 +90,172 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+.markdown-content {
+  color: var(--card-foreground);
+  @apply text-base;
+}
+.markdown-content > * {
+  margin-bottom: 0.5rem;
+}
+.markdown-content > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Titres */
+
+.markdown-content h1 {
+  @apply scroll-m-14 text-4xl font-extrabold tracking-tight lg:text-5xl;
+}
+
+.markdown-content h2 {
+  @apply mt-8 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+}
+.markdown-content h3 {
+  @apply mt-8 scroll-m-20 text-2xl font-semibold tracking-tight;
+}
+.markdown-content h4 {
+  @apply text-base;
+}
+
+/* Paragraphes */
+.markdown-content p {
+  @apply leading-7 [&:not(:first-child)]:mt-6;
+}
+
+/* Listes */
+.markdown-content ul {
+  @apply my-6 ml-6 list-disc [&>li]:mt-2 [&_ol]:!mt-0;
+}
+.markdown-content ol {
+  @apply my-6 ml-6 list-decimal [&>li]:mt-2 [&_ul]:!mt-0;
+}
+.markdown-content ol {
+  list-style: decimal;
+}
+.markdown-content ol li::marker {
+  @apply text-lg font-semibold;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5rem;
+}
+
+/* Code inline */
+
+.markdown-content pre code {
+  @apply text-sm;
+}
+
+/* Citations */
+.markdown-content blockquote {
+  @apply mt-6 border-l-2 pl-6 italic;
+}
+
+/* Liens */
+.markdown-content a {
+  @apply font-medium text-primary underline underline-offset-4;
+}
+
+/* Tables */
+.markdown-content table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+.markdown-content th,
+.markdown-content td {
+  padding: 0.5rem;
+  border: 1px solid rgb(209, 213, 219);
+}
+
+.markdown-content th {
+  background-color: rgb(243, 244, 246);
+  font-weight: 600;
+}
+
+/* Séparateurs horizontaux */
+.markdown-content hr {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid rgb(209, 213, 219);
+}
+/* One Dark Theme */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #abb2bf;
+  background: #282c34;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd;
+}
+
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75;
+}
+
+.hljs-literal {
+  color: #56b6c2;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee;
+}
+
+.hljs-built_in,
+.hljs-class .hljs-title,
+.hljs-title.class_ {
+  color: #e6c07b;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-link {
+  text-decoration: underline;
 }

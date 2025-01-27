@@ -1,23 +1,19 @@
-// import { AppSidebar } from '@/components/app-sidebar';
-// import { ChatForm } from '@/components/chat-input';
-// import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-// import { Outlet } from 'react-router';
-// import { AutoScrollContainer } from '@/components/auto-scroll-container';
-// import { ScrollToBottomButton } from '@/components/scroll-to-bottom-button';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 import { useSetAtom } from 'jotai';
-// import { sessionAtom } from '@/front-end/atoms/session.atoms';
-// import { getSync } from '@/front-end/api/sync.api';
-// import { useParams } from 'react-router';
-// import { Toaster } from '@/components/ui/toaster';
-// import { DeleteChatDialog } from '@/components/delete-chat-dialog';
-// import { RenameChatDialog } from '@/components/rename-chat-dialog';
+import { sessionAtom } from '~/front-end/atoms/session';
+import { SidebarProvider, SidebarTrigger } from '~/components/ui/sidebar';
+import { AppSidebar } from '~/components/app-sidebar';
+import { AutoScrollContainer } from '~/components/auto-scoll';
+import { ScrollToBottomButton } from '~/components/scroll-to-bottom-button';
+import { Toaster } from '~/components/ui/toaster';
+import { DeleteChatDialog } from '~/components/delete-chat-dialog';
+import { RenameChatDialog } from '~/components/rename-chat-dialog';
+import { Outlet } from 'react-router';
 
 export default function AppLayout() {
   const { data } = useSession();
   const setSession = useSetAtom(sessionAtom);
-  const params = useParams();
   React.useLayoutEffect(() => {
     if (data) {
       setSession(data.user);
