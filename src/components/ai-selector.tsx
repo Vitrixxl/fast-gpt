@@ -14,8 +14,10 @@ import { LucideCheck, LucideChevronsUpDown } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import React from 'react';
 import { clientModels } from '~/lib/ai-models';
+import { useAtomValue } from 'jotai';
+import { sessionAtom } from '~/front-end/atoms/session';
 
-export const AISelect = React.memo(() => {
+export function AISelect() {
   const [selected, setSelected] = React.useState<
     typeof clientModels[number]['key']
   >(
@@ -23,14 +25,35 @@ export const AISelect = React.memo(() => {
       | typeof clientModels[number]['key']
       | undefined || clientModels[0].key,
   );
+
+  const user = useAtomValue(sessionAtom);
   const [isOpen, setIsOpen] = React.useState(false);
 
+  React.useEffect(() => {
+    if ((!user || !user.premium) && selected != 'gpt-4o-mini') {
+      setSelected('gpt-4o-mini');
+      localStorage.setItem('assistant', 'gpt-4o-mini');
+    } else if (user) {
+      const authAssistant = localStorage.getItem('auth-assistant');
+      if (!authAssistant) return setSelected('gpt-4o-mini');
+      if (!user.premium && authAssistant != 'gpt-4o-mini') {
+        localStorage.setItem('auth-assistant', 'gpt-4o-mini');
+        setSelected('gpt-4o-mini');
+      }
+      localStorage.setItem('assistant', authAssistant);
+      setSelected(authAssistant as typeof clientModels[number]['key']);
+    }
+  }, [user]);
+
   const handleSelect = (value: typeof clientModels[number]['key']) => {
-    localStorage.setItem('assistant', value);
+    if (user) {
+      localStorage.setItem('auth-assistant', value);
+    } else {
+      localStorage.setItem('assistant', value);
+    }
     setSelected(value);
     setIsOpen(false);
   };
-
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
@@ -55,6 +78,7 @@ export const AISelect = React.memo(() => {
                   }}
                   key={m.key}
                   autoFocus={false}
+                  disabled={user?.premium ? false : m.key != 'gpt-4o-mini'}
                 >
                   {m.label}
                   {m.key == selected && (
@@ -68,5 +92,4 @@ export const AISelect = React.memo(() => {
       </PopoverContent>
     </Popover>
   );
-});
-AISelect.displayName = 'AiSelect';
+}

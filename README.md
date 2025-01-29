@@ -35,6 +35,10 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 First of all what i need to do 
 
 - [x] Copy every component
-- [ ] Finish every end point
-- [ ] Add a limite rate for free request with account and ip
+- [x] Add the syncro on load
+- [x] Finish every end point
+- [x] Add a limite rate for free request with account and ip
 - [ ] Add a payement process with stripe
+- [ ] Add the rules for data retentions
+- [x] Build the project and 
+- [ ] Go back to fucking drizzle cause prisma sucks so hard i would kill my self if i start a new project with it 

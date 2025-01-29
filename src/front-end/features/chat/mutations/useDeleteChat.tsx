@@ -8,6 +8,7 @@ import {
   userMessageWithContentAtom,
 } from '~/front-end/atoms/chat';
 import { deleteChatAtom } from '~/front-end/atoms/dialog';
+import { sessionAtom } from '~/front-end/atoms/session';
 import { dxdb } from '~/front-end/lib/dexie';
 import { useToast } from '~/hooks/use-toast';
 import { deleteChatAction } from '~/server/actions/chat/delete';
@@ -16,6 +17,7 @@ export const useDeleteChat = () => {
   const { toast } = useToast();
   const [deleteChatState, setDeleteChatState] = useAtom(deleteChatAtom);
   const setMessages = useSetAtom(messagesWithoutContentAtom);
+  const user = useAtomValue(sessionAtom);
   const setUserMessagesContent = useSetAtom(userMessageWithContentAtom);
   const setAssistantMessagesContent = useSetAtom(
     assistantMessageWithContentAtom,
@@ -33,7 +35,20 @@ export const useDeleteChat = () => {
       });
     }
     await dxdb.chats.delete(deleteChatState.id);
+    if (!user) {
+      return toast({
+        title: 'Deleted',
+        description: (
+          <div className='flex gap-2 items-center w-full justify-between'>
+            <span>The chat has been deleted</span>
+            <LucideCheck className='size-4' />
+          </div>
+        ),
+      });
+    }
+
     setDeleteChatState({ open: false, id: '' });
+
     const result = await deleteChatAction(deleteChatState.id);
     if (!result.success) {
       console.error(result.message);

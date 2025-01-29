@@ -7,9 +7,9 @@ interface BaseLoginButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   name: string;
   icon: React.ReactNode;
 }
-export const BaseLoginButton: React.FC<BaseLoginButtonProps> = (
-  { name, icon, ...props },
-) => {
+export function BaseLoginButton(
+  { name, icon, ...props }: BaseLoginButtonProps,
+) {
   return (
     <Button
       variant={'outline'}
@@ -25,9 +25,9 @@ export const BaseLoginButton: React.FC<BaseLoginButtonProps> = (
       </span>
     </Button>
   );
-};
+}
 
-export const GoogleLogin = () => {
+export function GoogleLogin() {
   return (
     <BaseLoginButton
       name='Google'
@@ -35,4 +35,4 @@ export const GoogleLogin = () => {
       onClick={() => signIn('google')}
     />
   );
-};
+}

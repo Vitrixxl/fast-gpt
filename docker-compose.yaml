@@ -1,0 +1,53 @@
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: postgres:latest
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # app:
+  #   build:
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - NODE_ENV=production
+  #     - DATABASE_URL=postgresql://postgres:8a8c48bdb66f565a77eb6b6a0ad7777d06165105cc04b16617500962a2591f31991d3923b30d02061bb59a4d089f99d269fb3de90277421ec1083b8f02e6cdc2@db:5432/fastgpt?schema=public
+  #     - REDIS_URL=redis://redis:6379
+  #     - NEXTAUTH_URL=http://localhost:3000
+  #   depends_on:
+  #     - redis
+  #     - db
+  #   networks:
+  #     - app-network
+  #   ports:
+  #     - "${APP_PORT:-3000}:3000"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { AutoScrollContainer } from '~/components/auto-scoll';
 interface AutoresizeTextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   maxRows?: number;
@@ -67,3 +68,5 @@ export const AutoresizeTextarea = React.forwardRef<
     />
   );
 });
+
+AutoScrollContainer.displayName = 'AutoScrollContainer';

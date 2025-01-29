@@ -4,7 +4,7 @@ generator client {
 }
 
 generator zod{
-provider="zod-prisma-types"
+  provider="zod-prisma-types"
 }
 
 
@@ -34,6 +34,7 @@ model User {
   sessions      Session[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
+  premium  Boolean @default(false)
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -99,7 +100,7 @@ model Authenticator {
 
 model Chat {
   id        String    @id @default(uuid()) 
-  user      User      @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id],onDelete: Cascade)
   userId    String    
   title     String    @db.VarChar(75)
   createdAt DateTime  @default(now()) @map(name: "created_at")
@@ -114,7 +115,7 @@ model Message {
   chat      Chat     @relation(fields: [chatId], references: [id],onDelete: Cascade)
   chatId    String   
   content   String   @db.Text
-  sender    Sender
+  role      Sender  @default(user)
   ai        Ai?
   createdAt DateTime @default(now())
 

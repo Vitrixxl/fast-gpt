@@ -1,14 +1,19 @@
 import { atom } from 'jotai';
-import { ClientMessage } from '~/front-end/types/chat';
+import {
+  AssistantMessageType,
+  ClientMessage,
+  UserMessageType,
+} from '~/front-end/types/chat';
 
-export const currentChatAtom = atom<string | undefined>();
+export const rateLimitAtom = atom<number | null>(null);
+export const currentChatAtom = atom<string | undefined | null>();
 
 export const messagesAtom = atom<ClientMessage[]>([]);
 
 export const isNewChatAtom = atom(false);
 
 export const messagesWithoutContentAtom = atom<
-  Omit<ClientMessage, 'content'>[]
+  Omit<UserMessageType | AssistantMessageType, 'content'>[]
 >(
   [],
 );

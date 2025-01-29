@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import highlight from 'highlight.js';
 
-import { marked } from 'marked';
+import { marked, Token } from 'marked';
 import ReactMarkDown from 'react-markdown';
 import { useAtomValue } from 'jotai';
 import { assistantMessageWithContentAtom } from '~/front-end/atoms/chat';
@@ -9,24 +9,25 @@ import { useToast } from '~/hooks/use-toast';
 import { LucideCheck, LucideCopy } from 'lucide-react';
 import { parseMarkdown } from '~/lib/utils';
 
-export const MemoizedMarkdownBlock = React.memo(
-  (props: { content: string }) => {
-    return (
-      <ReactMarkDown
-        components={{
-          code: (props) => (
-            <code
-              className='bg-accent px-1.5 py-0.5 rounded text-primary '
-              {...props}
-            />
-          ),
-        }}
-        className={`markdown-content text-card-foreground flex-1 min-w-0 max-w-full `}
-      >
-        {props.content}
-      </ReactMarkDown>
-    );
-  },
+function MarkdownBlock(props: { content: Token }) {
+  return (
+    <ReactMarkDown
+      components={{
+        code: (props) => (
+          <code
+            className='bg-accent px-1.5 py-0.5 rounded text-primary mx-0.5'
+            {...props}
+          />
+        ),
+      }}
+      className={`markdown-content text-card-foreground flex-1 min-w-0 max-w-full`}
+    >
+      {props.content.raw}
+    </ReactMarkDown>
+  );
+}
+export const MemoizedMarkdownBlock = React.memo((props: { content: Token }) =>
+  MarkdownBlock(props)
 );
 
 export const parseContent = (
@@ -35,39 +36,40 @@ export const parseContent = (
   return marked.lexer(content);
 };
 
-const Line = React.memo(
-  ({ content, lang }: { content: string; lang: string }) => {
-    const exist = Boolean(highlight.getLanguage(lang));
+function Line({ content, lang }: { content: string; lang: string }) {
+  const exist = Boolean(highlight.getLanguage(lang));
 
-    const parsedContent = highlight.highlight(content, {
-      language: exist ? lang : 'text',
-    });
+  const parsedContent = highlight.highlight(content, {
+    language: exist ? lang : 'text',
+  });
 
-    return (
-      <span
-        dangerouslySetInnerHTML={{ __html: parsedContent.value + '\n' }}
-        className={`text-nowrap language-${lang} `}
-      >
-      </span>
-    );
-  },
+  return (
+    <span
+      dangerouslySetInnerHTML={{ __html: parsedContent.value + '\n' }}
+      className={`text-nowrap language-${lang} `}
+    >
+    </span>
+  );
+}
+
+const MemoizedLine = React.memo((props: { content: string; lang: string }) =>
+  Line(props)
 );
 
-const OptimizedCodeBlock = React.memo((
-  { content, lang, messageId, id }: {
-    content: string;
-    lang: string;
-    messageId: string;
-    id: string;
-  },
-) => {
+function CodeBlock({ content, lang, messageId }: {
+  content: string;
+  lang: string;
+  messageId: string;
+  id: string;
+}) {
   const { toast } = useToast();
 
-  const lines = content.split('\n').slice(1);
-  const escapedLines = lines.slice(0, lines.length - 1);
+  const lines = content.split('\n').slice(1).filter((
+    l,
+  ) => (l != '```' && l != ''));
 
   const copy = () => {
-    navigator.clipboard.writeText(escapedLines.join('\n'));
+    navigator.clipboard.writeText(lines.join('\n'));
     toast({
       title: 'Copy',
       description: (
@@ -76,12 +78,13 @@ const OptimizedCodeBlock = React.memo((
           <LucideCheck className='size-4' />
         </div>
       ),
+      duration: 2000,
     });
   };
 
   return (
     <div className='border-border border rounded-lg overflow-hidden min-w-0 max-w-full mt-4 '>
-      <div className='bg-card border-b border-border flex justify-between items-center py-2 px-4'>
+      <div className=' border-b border-border flex justify-between items-center py-2 px-4'>
         <span className='text-sm  font-medium'>
           {lang || 'text'}
         </span>
@@ -92,12 +95,11 @@ const OptimizedCodeBlock = React.memo((
           <LucideCopy className='size-4' />
         </button>
       </div>
-      <div className='overflow-x-auto w-full bg-accent'>
-        {/* <ScrollArea> */}
-        <pre className='whitespace-pre-wrap p-2 text-sm bg-accent px-4 min-w-full w-max'>
+      <div className='overflow-x-auto w-full bg-[#282c34] text-[#abb2bf]'>
+        <pre className='whitespace-pre-wrap p-2 text-sm px-4 min-w-full w-max'>
       <code className='w-max'>
-      {escapedLines.map((m, id) => (
-        <Line
+      {lines.map((m, id) => (
+        <MemoizedLine
           content={m}
           lang={lang || 'text'}
           key={`${messageId}-${id}`}
@@ -105,12 +107,12 @@ const OptimizedCodeBlock = React.memo((
       ))}
       </code>
         </pre>
-        {/*   <ScrollBar orientation='horizontal' /> */}
-        {/* </ScrollArea> */}
       </div>
     </div>
   );
-});
+}
+
+const MemoizedCodeBlock = React.memo(CodeBlock);
 
 export const MarkdownRenderer = React.memo(
   ({ id }: { id: string }) => {
@@ -118,19 +120,21 @@ export const MarkdownRenderer = React.memo(
       assistantMessageWithContentAtom,
     );
     const content = messagesWithContent.find((m) => m.id == id)?.content;
-    if (!content) return;
+    if (!content) {
+      return <div className='bg-foreground size-4 rounded-full -mr-2 mt-1.5' />;
+    }
 
     const parsedContent = parseMarkdown(content);
 
     if (parsedContent.length == 0) {
-      return <div className='bg-foreground size-4 rounded-full -mr-2 mt-1' />;
+      return <div className='bg-black size-4 rounded-full -mr-2 mt-1' />;
     }
 
     return (
       parsedContent.map((m, i) =>
         m.type == 'code'
           ? (
-            <OptimizedCodeBlock
+            <MemoizedCodeBlock
               content={m.raw}
               messageId={id}
               id={id}
@@ -141,7 +145,7 @@ export const MarkdownRenderer = React.memo(
           : (
             <MemoizedMarkdownBlock
               key={i}
-              content={m.raw}
+              content={m}
             />
           )
       )

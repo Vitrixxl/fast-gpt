@@ -37,13 +37,19 @@ export const DeleteChatDialog = () => {
             >
               Cancel
             </Button>
-            <Button
-              variant={'destructive'}
-              autoFocus
-              onMouseDown={deleteChat}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                deleteChat();
+              }}
             >
-              Confirm
-            </Button>
+              <Button
+                variant={'destructive'}
+                autoFocus
+              >
+                Confirm
+              </Button>
+            </form>
           </div>
         </DialogFooter>
       </DialogContent>

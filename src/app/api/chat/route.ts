@@ -1,32 +1,44 @@
 import { v4 as uuid } from 'uuid';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '~/server/auth';
 import { getCompletion, getTitle } from '~/server/utils/chat-completion';
 import { db } from '~/server/db';
 import { ChatRequestSchema } from '~/app/api/chat/schema';
+import { headers } from 'next/headers';
+import { rateLimiter } from '~/app/api/chat/utils';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session || !session.user.premium) {
+      const headersList = await headers();
+      const ip = headersList.get('x-forwarded-for') || '';
+      const limited = await rateLimiter(ip);
+      if (limited) {
+        return NextResponse.json({
+          message: 'Hey buddy, it looks like you’ve run out of free requests!',
+        }, { status: 403 });
+      }
+    }
+
     const requestTimestamp = new Date();
+
     const requestId = uuid();
     const responseId = uuid();
     const body = await request.json();
-    console.log(body);
-    console.log(typeof body);
     const { error, data } = ChatRequestSchema.safeParse(body);
 
     if (error || !data) {
       return NextResponse.json(
-        { error: 'Invalid body', ...error },
+        { message: 'Invalid body', error },
         { status: 400 },
       );
     }
 
     const { messages, model, chatId } = data;
-    const session = await auth();
     if (!session && model != 'gpt-4o-mini') {
       return NextResponse.json(
-        { error: 'Do not try this again dumbass' },
+        { message: 'Do not try this again dumbass' },
         { status: 401 },
       );
     }
@@ -89,7 +101,7 @@ export async function POST(request: Request) {
                   id: requestId,
                   content: messages[messages.length - 1]?.content || '',
                   chatId,
-                  sender: 'user',
+                  role: 'user',
                   createdAt: requestTimestamp,
                 },
                 //response message
@@ -97,16 +109,18 @@ export async function POST(request: Request) {
                   id: responseId,
                   content: responseBuffer,
                   chatId,
-                  sender: 'assistant',
+                  role: 'assistant',
                   ai: model.startsWith('gpt') ? 'GPT' : 'CLAUDE',
-                  createdAt: new Date(),
+                  createdAt: new Date(requestTimestamp.getTime() + 1),
                 },
               ],
             });
           }
+          controller.close();
         } catch (error) {
           if (error instanceof Error) {
             controller.enqueue(encoder.encode(`ERROR:${error.message}`));
+            controller.close();
           }
         }
       },

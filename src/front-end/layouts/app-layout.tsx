@@ -12,26 +12,36 @@ import { RenameChatDialog } from '~/components/rename-chat-dialog';
 import { Outlet } from 'react-router';
 import { ChatForm } from '~/components/chat-form';
 import { SwitchTheme } from '~/components/switch-theme';
+import { useSync } from '~/front-end/features/chat/mutations/useSync';
+import { useRateLimiter } from '~/front-end/features/chat/mutations/useRateLimiter';
+import { useShortKeys } from '~/front-end/features/chat/mutations/useShortKeys';
 
 export default function AppLayout() {
   const { data } = useSession();
   const setSession = useSetAtom(sessionAtom);
+  const [synced, setSynced] = React.useState(false);
+  const sync = useSync();
+  const rateLimiter = useRateLimiter();
+  useShortKeys();
   React.useLayoutEffect(() => {
     if (data) {
       setSession(data.user);
+      if (!synced) {
+        setSynced(true);
+        sync();
+      }
+    }
+    if (!data || !data.user.premium) {
+      rateLimiter();
     }
   }, [data]);
-  // React.useEffect(() => {
-  //   if (data) getSync(params.id);
-  //   // Set eventListner for shortcut
-  // }, []);
 
   return (
     <SidebarProvider>
       <AppSidebar />
       <main className='min-h-full w-full min-w-0 flex-1'>
         <div className='flex h-dvh w-full flex-col overflow-hidden'>
-          <header className='sticky top-0 z-10 -mb-8 flex h-14 items-center gap-3  pr-2 px-2 justify-between bg-gradient-to-b from-background/50 via-background to-transparent'>
+          <header className=' py-2 sticky top-0 z-10 -mb-[3.25rem] flex h-fit items-center gap-3  pr-2 px-2 justify-between '>
             <SidebarTrigger />
             <SwitchTheme />
           </header>

@@ -17,9 +17,29 @@ const openai = new OpenAI({
 
 export async function* getCompletion(
   model: typeof models[number],
-  messages: { role: 'user' | 'assistant'; content: string }[],
+  messages: { role: any; content: string }[],
 ) {
+  const systemPrompt = `
+  Main Objective: You are a virtual assistant whose mission is to help users by responding precisely and relevantly to their requests.
+
+Task Prioritization: Your priority is to respond directly to the user's latest request. Analyze this request to understand its urgency and importance, and provide an appropriate response.
+
+Context Management: Take into account the context of previous interactions to enhance the quality and relevance of your responses. If the latest request is related to the previous context, integrate this information to provide a coherent and complete response.
+
+Context Filtering: If the latest request appears disconnected or unrelated to the previous context, respond only to this specific request without relying on past context.
+
+Clarity and Precision: Ensure that all your responses are formulated in a clear, precise, and understandable manner, providing additional explanations or information when necessary.
+
+Continuous Interaction: If a request is not clearly defined or if you need more information to provide an adequate response, don't hesitate to ask additional questions to clarify the user's needs.
+
+Adaptability: Be flexible and adapt to changes in directives or preferences expressed by the user during interactions.
+`;
+
   if (gptModels.find((m) => m == model)) {
+    messages.unshift({
+      role: 'developer',
+      content: systemPrompt,
+    });
     const completion = await openai.chat.completions.create({
       model,
       messages,
@@ -33,6 +53,7 @@ export async function* getCompletion(
     const stream = anthropic.messages.stream({
       model,
       max_tokens: 4000,
+      system: systemPrompt,
       messages,
       stream: true,
     });
@@ -53,6 +74,5 @@ export async function getTitle(prompt: string) {
     }, { role: 'user', content: prompt }],
   });
   if (!completion || !completion.choices[0]) return;
-  console.log(completion.choices[0].message.content);
   return completion.choices[0].message.content;
 }

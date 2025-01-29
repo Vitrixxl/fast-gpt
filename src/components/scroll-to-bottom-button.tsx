@@ -8,7 +8,7 @@ export const ScrollToBottomButton = () => {
   const setForceScroll = useSetAtom(forceScrollAtom);
   return (
     <Button
-      className={`hover:w-14 absolute -top-12 left-1/2 -translate-x-1/2 transition-[width]  hover:bg-primary ${
+      className={`duration-100 hover:w-14 absolute -top-12 left-1/2 -translate-x-1/2 transition-[width,opacity]  hover:bg-primary ${
         isAtBottom ? 'opacity-0 pointer-events-none' : 'opacity-100'
       } `}
       onClick={() => setForceScroll(true)}

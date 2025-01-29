@@ -35,7 +35,7 @@ const router = createBrowserRouter([
             store.set(isNewChatAtom, false);
             return;
           }
-          setChatMessages(id);
+          return setChatMessages(id);
         }),
 
         element: <MessageContainer />,

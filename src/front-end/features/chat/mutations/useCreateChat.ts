@@ -5,7 +5,7 @@ export const useCreateChat = () => {
   const navigate = useNavigate();
   return async () => {
     const id = await createChat();
-    // if (!id) return;
-    // navigate(`chat/${id}`);
+    if (!id) return;
+    navigate(`chat/${id}`);
   };
 };

@@ -2,15 +2,25 @@
 import { AutoresizeTextarea } from '~/components/auto-resize-textarea';
 import { Button } from '~/components/ui/button';
 import { isImportantKey } from '~/lib/keyboard-utils';
-import { LucideArrowUp, LucidePaperclip } from 'lucide-react';
+import {
+  LucideArrowUp,
+  LucideCircleAlert,
+  LucidePaperclip,
+} from 'lucide-react';
 import React from 'react';
 import { AISelect } from '~/components/ai-selector';
 import { useAtomValue } from 'jotai';
 import { renameChatAtom } from '~/front-end/atoms/dialog';
 import { useSendMessage } from '~/front-end/features/chat/mutations/useSendMessage';
-import { setPriority } from 'os';
+import { rateLimitAtom } from '~/front-end/atoms/chat';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
+import { sessionAtom } from '~/front-end/atoms/session';
 
-export const ChatForm = () => {
+export function ChatForm() {
   const [prompt, setPrompt] = React.useState('');
   const isRenameChatOpen = useAtomValue(renameChatAtom);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
@@ -59,20 +69,38 @@ export const ChatForm = () => {
       <div className='flex justify-between items-center w-full'>
         <AISelect />
         <div className='flex gap-2 w-fit'>
+          <LimitRateButton />
           <FileButton></FileButton>
-          <Button
-            size='icon'
-            onMouseDown={() => sendMessage(prompt)}
+          <SendButton
+            onMouseDown={() => {
+              setPrompt('');
+              sendMessage(prompt);
+            }}
             disabled={prompt == ''}
           >
             <LucideArrowUp />
-          </Button>
+          </SendButton>
         </div>
       </div>
     </div>
   );
-};
-const FileButton = (props: React.HTMLAttributes<HTMLButtonElement>) => {
+}
+
+function SendButton(
+  { disabled, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>,
+) {
+  const rateLimit = useAtomValue(rateLimitAtom);
+  return (
+    <Button
+      size='icon'
+      disabled={disabled || Boolean(rateLimit && rateLimit >= 20)}
+      {...props}
+    >
+      <LucideArrowUp />
+    </Button>
+  );
+}
+function FileButton(props: React.HTMLAttributes<HTMLButtonElement>) {
   return (
     <Button
       variant={'ghost'}
@@ -82,4 +110,31 @@ const FileButton = (props: React.HTMLAttributes<HTMLButtonElement>) => {
       <LucidePaperclip />
     </Button>
   );
-};
+}
+
+function LimitRateButton() {
+  const user = useAtomValue(sessionAtom);
+  const rateLimit = useAtomValue(rateLimitAtom);
+  if (rateLimit && (20 - rateLimit <= 10) && (!user || !user.premium)) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button asChild variant={'destructive'} size='icon'>
+            <span>
+              <LucideCircleAlert />
+            </span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent
+          align='center'
+          side='top'
+          className='bg-destructive text-destructive-foreground'
+        >
+          {rateLimit == 20
+            ? 'No free message left'
+            : `Only ${20 - rateLimit} free messages left`}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+}

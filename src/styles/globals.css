@@ -34,6 +34,7 @@ body * ::selection {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --code: 220 23% 95%;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -42,6 +43,18 @@ body * ::selection {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --bg-color: #282c34;
+    --text-color: #abb2bf;
+    --comment-color: #5c6370;
+    --keyword-color: #c678dd;
+    --section-color: #e06c75;
+    --literal-color: #56b6c2;
+    --string-color: #98c379;
+    --attr-color: #d19a66;
+    --symbol-color: #61aeee;
+    --builtin-color: #e6c07b;
+    --emphasis-style: italic;
+    --strong-style: bold;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -68,6 +81,7 @@ body * ::selection {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --code: 220 13% 18%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 0 0% 98%;
@@ -76,6 +90,18 @@ body * ::selection {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --bg-color: #282c34;
+    --text-color: #abb2bf;
+    --comment-color: #5c6370;
+    --keyword-color: #c678dd;
+    --section-color: #e06c75;
+    --literal-color: #56b6c2;
+    --string-color: #98c379;
+    --attr-color: #d19a66;
+    --symbol-color: #61aeee;
+    --builtin-color: #e6c07b;
+    --emphasis-style: italic;
+    --strong-style: bold;
   }
 }
 
@@ -182,20 +208,20 @@ body * ::selection {
   display: block;
   overflow-x: auto;
   padding: 0.5em;
-  color: #abb2bf;
-  background: #282c34;
+  color: var(--text-color);
+  background: var(--bg-color);
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: #5c6370;
-  font-style: italic;
+  color: var(--comment-color);
+  font-style: var(--emphasis-style);
 }
 
 .hljs-doctag,
 .hljs-keyword,
 .hljs-formula {
-  color: #c678dd;
+  color: var(--keyword-color);
 }
 
 .hljs-section,
@@ -203,11 +229,11 @@ body * ::selection {
 .hljs-selector-tag,
 .hljs-deletion,
 .hljs-subst {
-  color: #e06c75;
+  color: var(--section-color);
 }
 
 .hljs-literal {
-  color: #56b6c2;
+  color: var(--literal-color);
 }
 
 .hljs-string,
@@ -215,7 +241,7 @@ body * ::selection {
 .hljs-addition,
 .hljs-attribute,
 .hljs-meta .hljs-string {
-  color: #98c379;
+  color: var(--string-color);
 }
 
 .hljs-attr,
@@ -226,7 +252,7 @@ body * ::selection {
 .hljs-selector-attr,
 .hljs-selector-pseudo,
 .hljs-number {
-  color: #d19a66;
+  color: var(--attr-color);
 }
 
 .hljs-symbol,
@@ -235,23 +261,115 @@ body * ::selection {
 .hljs-meta,
 .hljs-selector-id,
 .hljs-title {
-  color: #61aeee;
+  color: var(--symbol-color);
 }
 
 .hljs-built_in,
 .hljs-class .hljs-title,
 .hljs-title.class_ {
-  color: #e6c07b;
+  color: var(--builtin-color);
 }
 
 .hljs-emphasis {
-  font-style: italic;
+  font-style: var(--emphasis-style);
 }
 
 .hljs-strong {
-  font-weight: bold;
+  font-weight: var(--strong-style);
 }
 
 .hljs-link {
   text-decoration: underline;
+}
+.markdown-container h1 {
+  @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+}
+
+.markdown-container h2 {
+  @apply mt-4 scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+}
+
+.markdown-container h3 {
+  @apply mt-6 scroll-m-20 text-2xl font-semibold tracking-tight;
+}
+
+.markdown-container h4 {
+  @apply scroll-m-20 text-xl font-semibold tracking-tight;
+}
+
+.markdown-container p {
+  @apply leading-7 [&:not(:first-child)]:mt-4;
+}
+
+.markdown-container blockquote {
+  @apply mt-6 border-l-2 pl-6 italic;
+}
+
+.markdown-container ul {
+  @apply my-6 ml-6 list-disc [&>li]:mt-2;
+}
+
+.markdown-container ol {
+  @apply my-6 ml-6 list-decimal [&>li]:mt-2;
+}
+
+.markdown-container code {
+  @apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
+}
+
+.markdown-container lead {
+  @apply text-xl text-muted-foreground;
+}
+
+.markdown-container large {
+  @apply text-lg font-semibold;
+}
+
+.markdown-container small {
+  @apply text-sm font-medium leading-none;
+}
+
+.markdown-container muted {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Links */
+.markdown-container a {
+  @apply font-medium text-primary underline underline-offset-4;
+}
+
+/* Table styles */
+.markdown-container table {
+  @apply w-full border-collapse border border-border;
+}
+
+.markdown-container th {
+  @apply border border-border bg-muted px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
+}
+
+.markdown-container td {
+  @apply border border-border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+}
+
+/* Inline code blocks */
+.markdown-container pre {
+  @apply mb-4 mt-6 overflow-x-auto rounded-lg border bg-black py-4;
+}
+
+.markdown-container pre code {
+  @apply relative rounded bg-transparent px-0 py-0 font-mono text-sm font-semibold text-white;
+}
+
+/* Description lists */
+.markdown-container dt {
+  @apply font-semibold;
+}
+
+.markdown-container dd {
+  @apply ml-4 mt-2;
+}
+
+/* Horizontal rule */
+.markdown-container hr {
+  @apply my-4 border-border;
 }

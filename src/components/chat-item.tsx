@@ -8,21 +8,25 @@ import {
 } from '~/components/ui/dropdown-menu';
 import { SidebarMenuButton, SidebarMenuItem } from '~/components/ui/sidebar';
 import { deleteChatAtom, renameChatAtom } from '~/front-end/atoms/dialog';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { LucideEdit, LucideEllipsisVertical, LucideTrash } from 'lucide-react';
 import React from 'react';
 import { Chat } from '@prisma/client';
 import { useSwitchChat } from '~/front-end/features/chat/mutations/useSwitchChat';
+import { currentChatAtom } from '~/front-end/atoms/chat';
 export const ChatItem = (chat: Omit<Chat, 'userId'>) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const setDeleteChat = useSetAtom(deleteChatAtom);
   const setRenameChat = useSetAtom(renameChatAtom);
+  const currentChat = useAtomValue(currentChatAtom);
   const switchChat = useSwitchChat();
   return (
     <SidebarMenuItem key={chat.id}>
       <SidebarMenuButton
-        className='flex gap-2 hover:[&>button]:opacity-100 h-fit py-0.5 !min-h-0 pr-0 pl-4'
-        onMouseDown={() => switchChat(chat.id)}
+        className={`flex gap-2 hover:[&>button]:opacity-100 h-fit py-0.5 !min-h-0 pr-0 pl-4  ${
+          chat.id == currentChat ? '!bg-accent' : ''
+        } `}
+        onClick={() => switchChat(chat.id)}
       >
         <span className='!items-start gap-2 flex-1'>
           <span className='!whitespace-normal line-clamp-2'>

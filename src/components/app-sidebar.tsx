@@ -4,7 +4,7 @@ import { NavHeader } from '~/components/app-sidebar-header';
 import { Sidebar, SidebarContent } from '~/components/ui/sidebar';
 import React from 'react';
 
-export const AppSidebar: React.FC = () => {
+export function AppSidebar() {
   return (
     <Sidebar collapsible='icon'>
       <NavHeader />
@@ -14,6 +14,4 @@ export const AppSidebar: React.FC = () => {
       <NavFooter />
     </Sidebar>
   );
-};
-
-AppSidebar.displayName = 'AppSidebar';
+}

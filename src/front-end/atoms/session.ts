@@ -1,4 +1,4 @@
 import { atom } from 'jotai';
-import { User } from 'next-auth';
+import { Session } from 'next-auth';
 
-export const sessionAtom = atom<User | null>(null);
+export const sessionAtom = atom<Session['user'] | null>(null);
