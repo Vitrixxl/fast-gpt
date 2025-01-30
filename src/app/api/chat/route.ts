@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session || !session.user.premium) {
       const headersList = await headers();
-      const ip = headersList.get('x-forwarded-for') || '';
+      const ip = headersList.get('x-real-ip') || '';
       const limited = await rateLimiter(ip);
       if (limited) {
         return NextResponse.json({

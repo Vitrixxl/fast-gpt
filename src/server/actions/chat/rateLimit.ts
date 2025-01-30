@@ -5,7 +5,7 @@ import { redis } from '~/server/redis';
 
 export const getRateLimitAction = async () => {
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for') || '';
+  const ip = headersList.get('x-real-ip') || '';
   const key = getKey(ip);
   try {
     const currentCount = parseInt(await redis.get(key) || '20');
