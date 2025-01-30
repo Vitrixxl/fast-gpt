@@ -15,6 +15,11 @@ export async function POST(request: NextRequest) {
     if (!session || !session.user.premium) {
       const headersList = await headers();
       const ip = headersList.get('x-real-ip') || '';
+      console.log(
+        headersList.get('x-real-ip'),
+        headersList.get('x-forwarded-for'),
+      );
+      console.log(ip);
       const limited = await rateLimiter(ip);
       if (limited) {
         return NextResponse.json({
