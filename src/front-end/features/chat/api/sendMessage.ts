@@ -55,7 +55,7 @@ export const sendMessage = async (prompt: string, chatId: string) => {
       messages: chatMessages,
       model,
     });
-    const result = await fetch('http://localhost:3000/api/chat', {
+    const result = await fetch('http://84.234.19.41:80/api/chat', {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
